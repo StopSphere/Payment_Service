@@ -30,8 +30,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         payment = paymentRepository.save(payment);
 
-        boolean success =            //intentionally simulating false
-                Math.random() > 0.2;
+        boolean success = Math.random() > 0.2;
 
         if(success){
 
