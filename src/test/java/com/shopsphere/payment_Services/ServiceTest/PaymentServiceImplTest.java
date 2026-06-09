@@ -63,11 +63,11 @@ class PaymentServiceImplTest {
         verify(paymentRepository, times(2))
                 .save(any(Payment.class));
 
-//        verify(paymentEventProducer, times(1))
-//                .publishFailure(any(PaymentFailedEvent.class));
-//
-//        verify(paymentEventProducer, times(1))
-//                .publishInventoryRelease(any(InventoryReleaseEvent.class));
+        verify(paymentEventProducer, times(1))
+                .publishFailure(any(PaymentFailedEvent.class));
+
+        verify(paymentEventProducer, times(1))
+                .publishInventoryRelease(any(InventoryReleaseEvent.class));
 
         ArgumentCaptor<InventoryReleaseEvent> captor =
                 ArgumentCaptor.forClass(InventoryReleaseEvent.class);
