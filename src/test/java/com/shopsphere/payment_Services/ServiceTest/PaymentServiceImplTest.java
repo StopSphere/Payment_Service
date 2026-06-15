@@ -11,7 +11,6 @@ import com.shopsphere.payment_Services.Service.Impl.PaymentServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -30,9 +29,6 @@ class PaymentServiceImplTest {
 
     @Mock
     private PaymentEventProducer paymentEventProducer;
-
-    @InjectMocks
-    private PaymentServiceImpl paymentService;
 
     @Test
     void shouldProcessFailedPaymentAndPublishCompensationEvents() {
@@ -57,6 +53,12 @@ class PaymentServiceImplTest {
 
         when(paymentRepository.save(any(Payment.class)))
                 .thenReturn(savedPayment);
+
+        // spy so we can force the failure branch deterministically
+        PaymentServiceImpl paymentService =
+                spy(new PaymentServiceImpl(paymentRepository, paymentEventProducer));
+
+        doReturn(false).when(paymentService).isPaymentSuccessful();
 
         paymentService.processPayment(event);
 

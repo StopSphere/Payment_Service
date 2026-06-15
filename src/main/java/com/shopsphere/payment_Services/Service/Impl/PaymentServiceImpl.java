@@ -5,7 +5,6 @@ import com.shopsphere.payment_Services.Entity.PaymentStatus;
 import com.shopsphere.payment_Services.Kafka.*;
 import com.shopsphere.payment_Services.Repository.PaymentRepository;
 import com.shopsphere.payment_Services.Service.PaymentService;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,14 +29,11 @@ public class PaymentServiceImpl implements PaymentService {
 
         payment = paymentRepository.save(payment);
 
-//        boolean success = Math.random() > 0.2;
-        boolean success = false;
+        boolean success = isPaymentSuccessful();
 
-        if(success){
+        if (success) {
 
-            payment.setStatus(
-                    PaymentStatus.SUCCESS
-            );
+            payment.setStatus(PaymentStatus.SUCCESS);
 
             paymentRepository.save(payment);
 
@@ -49,11 +45,9 @@ public class PaymentServiceImpl implements PaymentService {
                     )
             );
 
-        }else{
+        } else {
 
-            payment.setStatus(
-                    PaymentStatus.FAILED
-            );
+            payment.setStatus(PaymentStatus.FAILED);
 
             paymentRepository.save(payment);
 
@@ -64,18 +58,19 @@ public class PaymentServiceImpl implements PaymentService {
                             payment.getAmount()
                     )
             );
-            System.out.println("=== BEFORE PUBLISH ===");
-            System.out.println("ORDER ID = " + event.getOrderId());
-            System.out.println("PRODUCT ID = " + event.getProductId());
-            System.out.println("QUANTITY = " + event.getQuantity());
+
             paymentEventProducer.publishInventoryRelease(
                     new InventoryReleaseEvent(
                             event.getOrderId(),
                             event.getProductId(),
                             event.getQuantity()
-
                     )
             );
         }
+    }
+
+    // extracted so test can override/spy this and force success/failure deterministically
+    public boolean isPaymentSuccessful() {
+        return Math.random() > 0.2;
     }
 }
